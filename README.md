@@ -367,3 +367,138 @@ OUTPUT
 |The Avengers| 	Intense|
 |The Dark Knight| 	Intense|
 |Star Wars: Episode I - The Phantom Menace| 	Intense|
+
+## AGGREGATE FUNCTIONS
+### COUNT
+Serve para contar quantas linhas há.\
+O count é uma função que recebe o nome de uma coluna como argumento e conta o número de valores NÃO VAZIOS naquela coluna.
+```SQL
+SELECT COUNT(*)
+FROM table_name;
+```
+
+### SUM
+SUM é uma função que recebe um nome de uma coluna como argumento e retorna a soma de todos os valores daquela coluna.
+```SQL
+SELECT SUM(downloads)
+FROM fake_apps;
+```
+
+### MAX / MIN
+As funções MAX e MIN retornam o maior e menor valor de uma coluna, respectivamente.
+```SQL
+SELECT MAX(price)
+FROM fake_apps;
+
+SELECT MIN(downloads)
+FROM fake_apps;
+```
+
+### AVERAGE (AVG)
+Calcula a média de uma coluna.
+```SQL
+SELECT AVG(downloads)
+FROM fake_apps;
+```
+
+### ROUND
+A função ROUND recebe 2 argumentos, o nome de uma coluna e um inteiro.\
+It rounds the values in the column to the number of decimal places specified by the integer.
+```SQL
+SELECT ROUND(price, 0)
+FROM fake_apps;
+```
+No exemplo abaixo, ele pega o valor da média de preço e depois arredonda.
+```SQL
+SELECT ROUND(AVG(price), 2)
+FROM fake_apps;
+```
+
+### GROUP BY
+Serve para agrupar.\
+Em vez de fazermos isso para agrupar a média de notas de filme por ano:
+```SQL
+SELECT AVG(imdb_rating)
+FROM movies
+WHERE year = 1999;
+
+SELECT AVG(imdb_rating)
+FROM movies
+WHERE year = 2000;
+
+SELECT AVG(imdb_rating)
+FROM movies
+WHERE year = 2001;
+```
+
+Podemos fazer isso
+```SQL
+SELECT year,
+   AVG(imdb_rating)
+FROM movies
+GROUP BY year
+ORDER BY year;
+```
+
+Veja o output desse exemplo abaixo:
+```SQL
+SELECT price, COUNT(*) 
+FROM fake_apps
+GROUP BY price;
+```
+OUTPUT:
+|price | COUNT(*)|
+|:---: | :---: |
+|0.0 |	73|
+|0.99 |	43|
+|1.99 |	42|
+|2.99 |	21|
+|3.99 |	9|
+|14.99 |	12|
+<!-- TESTE -->
+Também podemos fazer desse jeito:
+```SQL
+SELECT ROUND(imdb_rating),
+   COUNT(name)
+FROM movies
+GROUP BY 1
+ORDER BY 1;
+```
+Onde o 1 se refere ao primeiro nome da tabela do código(imdb_rating).\
+Outro exemplo:
+```SQL
+SELECT category, 
+   price,
+   AVG(downloads)
+FROM fake_apps
+GROUP BY 1, 2;
+```
+O 1 é category e o 2 é price.
+
+### HAVING
+É como se fosse o WHERE mas para o GROUP BY.
+- When we want to limit the results of a query based on values of the individual rows, use WHERE.
+- When we want to limit the results of a query based on an aggregate property, use HAVING.
+```SQL
+SELECT price, 
+   ROUND(AVG(downloads)),
+   COUNT(*)
+FROM fake_apps
+GROUP BY price HAVING COUNT(*) > 50;
+```
+No código acima, caso algum grupo tenha menos que 51 apps, ele será excluído.\
+\
+OUTPUT SEM O HAVING:
+|price |	ROUND(AVG(downloads)) |	COUNT(*)|
+|:---:|:---:|:---:|
+|0.0 |	15762.0 |	73|
+|0.99 |	15972.0 |	43|
+|1.99 |	16953.0 |	42|
+|2.99 |	17725.0 |	21|
+|3.99 |	18742.0 |	9|
+|14.99 |	19369.0 |	12|
+
+OUTPUT COM O HAVING:
+|price |	ROUND(AVG(downloads)) |	COUNT(*) |
+|:---:|:---:|:---:|
+|0.0 |	15762.0 |	73|
